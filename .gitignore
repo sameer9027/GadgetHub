@@ -1,0 +1,28 @@
+# Ignore Visual Studio files
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Ignore build outputs
+bin/
+obj/
+out/
+
+# Ignore EF Core migration snapshots
+**/Migrations/*Snapshot.cs
+
+# Ignore secrets and config overrides
+appsettings.*.json
+secrets.json
+
+# Ignore frontend artifacts (React, etc.)
+Frontend/**/node_modules/
+Frontend/**/build/
+Frontend/**/.env
+
+# Ignore test results
+TestResults/
+coverage/
+*.coverage

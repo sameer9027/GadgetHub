@@ -1,0 +1,6 @@
+@GadgetHub.Web.API_HostAddress = http://localhost:5204
+
+GET {{GadgetHub.Web.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
