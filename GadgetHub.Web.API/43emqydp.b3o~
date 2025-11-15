@@ -23,20 +23,14 @@
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="10.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.0.1" />
   </ItemGroup>
-	<PropertyGroup>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<NoWarn>$(NoWarn);1591</NoWarn>
-	</PropertyGroup>
-	
-	
-  <ItemGroup>
-    <Folder Include="Middleware\" />
-  </ItemGroup>
-	
-	
+
   <ItemGroup>
     <ProjectReference Include="..\GadgetHub.Application\GadgetHub.Application.csproj" />
     <ProjectReference Include="..\GadgetHub.Infrastructure\GadgetHub.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Middleware\" />
   </ItemGroup>
 
 </Project>

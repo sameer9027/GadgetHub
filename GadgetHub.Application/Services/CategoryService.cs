@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿
+using AutoMapper;
 using GadgetHub.Application.DTOs.Categories;
 using GadgetHub.Application.Interfaces;
 using GadgetHub.Domain.Interfaces;
@@ -29,14 +30,22 @@ public class CategoryService : ICategoryService
     {
         try
         {
+            // Fetch categories and products once
             var categories = await _categoryRepository.GetAllAsync();
-            var categoryDtos = _mapper.Map<IEnumerable<CategoryDto>>(categories);
+            var products = await _productRepository.GetAllAsync();
 
-            // Set product count for each category
+            // Build counts per category
+            var counts = products
+                .GroupBy(p => p.CategoryId)
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            // Materialize mapped DTOs into a List to avoid deferred execution issues
+            var categoryDtos = _mapper.Map<List<CategoryDto>>(categories) ?? new List<CategoryDto>();
+
+            // Assign product counts
             foreach (var categoryDto in categoryDtos)
             {
-                var products = await _productRepository.GetByCategoryAsync(categoryDto.Id);
-                categoryDto.ProductCount = products.Count();
+                categoryDto.ProductCount = counts.TryGetValue(categoryDto.Id, out var c) ? c : 0;
             }
 
             return categoryDtos;
