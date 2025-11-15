@@ -1,0 +1,111 @@
+﻿@model GadgetHub.Web.MVC.ViewModels.Products.ProductListViewModel
+
+@{
+    ViewData["Title"] = "Products";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Products</h1>
+    <a asp-action="Create" class="btn btn-primary">Create New</a>
+</div>
+
+<!-- Filter Section -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Filter Products</h5>
+    </div>
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label for="SearchTerm" class="form-label">Search</label>
+                <input type="text" class="form-control" id="SearchTerm" name="SearchTerm" value="@Model.Filter.SearchTerm" placeholder="Search products...">
+            </div>
+            <div class="col-md-3">
+                <label for="CategoryId" class="form-label">Category</label>
+                <select class="form-select" id="CategoryId" name="CategoryId">
+                    <option value="">All Categories</option>
+                    @foreach (var category in Model.Categories)
+                    {
+                        <option value="@category.Id" selected="@(Model.Filter.CategoryId == category.Id)">@category.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="SortBy" class="form-label">Sort By</label>
+                <select class="form-select" id="SortBy" name="SortBy">
+                    <option value="name" selected="@(Model.Filter.SortBy == "name")">Name</option>
+                    <option value="price" selected="@(Model.Filter.SortBy == "price")">Price</option>
+                    <option value="createdDate" selected="@(Model.Filter.SortBy == "createdDate")">Date Created</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="SortAsc" class="form-label">Order</label>
+                <select class="form-select" id="SortAsc" name="SortAsc">
+                    <option value="true" selected="@(Model.Filter.SortAsc == true)">Ascending</option>
+                    <option value="false" selected="@(Model.Filter.SortAsc == false)">Descending</option>
+                </select>
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Apply Filters</button>
+                <a asp-action="Index" class="btn btn-secondary">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Products Table -->
+@if (Model.Products.Any())
+{
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Price</th>
+                            <th>Category</th>
+                            <th>Created Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var product in Model.Products)
+                        {
+                            <tr>
+                                <td>@product.Name</td>
+                                <td>@(product.Description?.Length > 50 ? product.Description.Substring(0, 50) + "..." : product.Description)</td>
+                                <td>₹@product.Price.ToString("F2")</td>
+                                <td>@product.CategoryName</td>
+                                <td>@product.CreatedDate.ToString("MMM dd, yyyy")</td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a asp-action="Edit" asp-route-id="@product.Id" class="btn btn-sm btn-warning">Edit</a>
+                                        <form asp-action="Delete" method="post" class="d-inline">
+                                            <input type="hidden" name="id" value="@product.Id" />
+                                            <button type="submit" class="btn btn-sm btn-danger"
+                                                    onclick="return confirm('Are you sure you want to delete this product?')">
+                                                Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination Partial -->
+    <partial name="_Pagination" model="Model" />
+}
+else
+{
+    <div class="alert alert-info text-center">
+        <h4>No products found</h4>
+        <p>No products match your current filters. Try adjusting your search criteria or <a asp-action="Create" class="alert-link">create a new product</a>.</p>
+    </div>
+}

@@ -1,0 +1,68 @@
+﻿@model GadgetHub.Web.MVC.ViewModels.Products.ProductListViewModel
+
+@if (Model.Pagination.TotalPages > 1)
+{
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            <!-- Previous Page -->
+            <li class="page-item @(Model.Pagination.HasPrevious ? "" : "disabled")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@(Model.Pagination.Page - 1)"
+                   asp-route-pageSize="@Model.Pagination.PageSize"
+                   asp-route-CategoryId="@Model.Filter.CategoryId"
+                   asp-route-SearchTerm="@Model.Filter.SearchTerm"
+                   asp-route-SortBy="@Model.Filter.SortBy"
+                   asp-route-SortAsc="@Model.Filter.SortAsc">
+                    &laquo; Previous
+                </a>
+            </li>
+
+            <!-- Page Numbers -->
+            @for (int i = 1; i <= Model.Pagination.TotalPages; i++)
+            {
+                if (i == 1 || i == Model.Pagination.TotalPages || (i >= Model.Pagination.Page - 2 && i <= Model.Pagination.Page + 2))
+                {
+                    <li class="page-item @(i == Model.Pagination.Page ? "active" : "")">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-page="@i"
+                           asp-route-pageSize="@Model.Pagination.PageSize"
+                           asp-route-CategoryId="@Model.Filter.CategoryId"
+                           asp-route-SearchTerm="@Model.Filter.SearchTerm"
+                           asp-route-SortBy="@Model.Filter.SortBy"
+                           asp-route-SortAsc="@Model.Filter.SortAsc">@i</a>
+                    </li>
+                }
+                else if (i == Model.Pagination.Page - 3 || i == Model.Pagination.Page + 3)
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                }
+            }
+
+            <!-- Next Page -->
+            <li class="page-item @(Model.Pagination.HasNext ? "" : "disabled")">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@(Model.Pagination.Page + 1)"
+                   asp-route-pageSize="@Model.Pagination.PageSize"
+                   asp-route-CategoryId="@Model.Filter.CategoryId"
+                   asp-route-SearchTerm="@Model.Filter.SearchTerm"
+                   asp-route-SortBy="@Model.Filter.SortBy"
+                   asp-route-SortAsc="@Model.Filter.SortAsc">
+                    Next &raquo;
+                </a>
+            </li>
+        </ul>
+    </nav>
+}
+
+<!-- Results Count -->
+@if (Model.Pagination.TotalCount > 0)
+{
+    <div class="text-muted text-center mt-2">
+        Showing @Model.Pagination.StartItem to @Model.Pagination.EndItem of @Model.Pagination.TotalCount items
+    </div>
+}

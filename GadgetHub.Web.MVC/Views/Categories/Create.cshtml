@@ -1,0 +1,41 @@
+﻿@model GadgetHub.Web.MVC.ViewModels.Categories.CreateCategoryViewModel
+
+@{
+    ViewData["Title"] = "Create Category";
+}
+
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Create New Category</h4>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" method="post">
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label">Category Name</label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label">Description</label>
+                        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a asp-action="Index" class="btn btn-secondary me-md-2">Back to List</a>
+                        <button type="submit" class="btn btn-primary">Create Category</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
