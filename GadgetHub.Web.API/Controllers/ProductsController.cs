@@ -32,7 +32,7 @@ public class ProductsController : ControllerBase
         try
         {
             var (products, totalCount) = await _productService.GetPagedAsync(
-                page, pageSize, categoryId, sortBy, sortAsc, search);
+                page, pageSize, categoryId, sortBy, sortAsc, search);  // -  Delegates the work to the Service Layer.
 
             var response = new
             {
@@ -60,6 +60,7 @@ public class ProductsController : ControllerBase
         try
         {
             var product = await _productService.GetByIdAsync(id);
+
             if (product == null)
                 return NotFound($"Product with ID {id} not found");
 

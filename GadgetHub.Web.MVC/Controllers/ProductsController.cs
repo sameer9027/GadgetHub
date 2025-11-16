@@ -72,8 +72,9 @@ public class ProductsController : Controller
         try
         {
             var categories = await _apiClient.GetCategoriesAsync();
-            var viewModel = new CreateProductViewModel
+            var viewModel = new ProductFormViewModel
             {
+                Id = 0, // Indicates create mode
                 Categories = categories.Select(c => new CategoryViewModel
                 {
                     Id = c.Id,
@@ -81,63 +82,13 @@ public class ProductsController : Controller
                 }).ToList()
             };
 
-            return View(viewModel);
+            return View("Form", viewModel);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error loading categories for product creation");
             TempData["Error"] = "An error occurred while loading categories.";
             return RedirectToAction(nameof(Index));
-        }
-    }
-
-    // POST: Products/Create
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(CreateProductViewModel viewModel)
-    {
-        try
-        {
-            if (ModelState.IsValid)
-            {
-                var createDto = new CreateProductDto
-                {
-                    Name = viewModel.Name,
-                    Description = viewModel.Description,
-                    Price = viewModel.Price,
-                    CategoryId = viewModel.CategoryId
-                };
-
-                await _apiClient.CreateProductAsync(createDto);
-
-                TempData["Success"] = "Product created successfully!";
-                return RedirectToAction(nameof(Index));
-            }
-
-            // Reload categories if validation fails
-            var categories = await _apiClient.GetCategoriesAsync();
-            viewModel.Categories = categories.Select(c => new CategoryViewModel
-            {
-                Id = c.Id,
-                Name = c.Name
-            }).ToList();
-
-            return View(viewModel);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error creating product");
-            TempData["Error"] = "An error occurred while creating the product.";
-
-            // Reload categories
-            var categories = await _apiClient.GetCategoriesAsync();
-            viewModel.Categories = categories.Select(c => new CategoryViewModel
-            {
-                Id = c.Id,
-                Name = c.Name
-            }).ToList();
-
-            return View(viewModel);
         }
     }
 
@@ -154,7 +105,7 @@ public class ProductsController : Controller
             }
 
             var categories = await _apiClient.GetCategoriesAsync();
-            var viewModel = new UpdateProductViewModel
+            var viewModel = new ProductFormViewModel
             {
                 Id = product.Id,
                 Name = product.Name,
@@ -168,7 +119,7 @@ public class ProductsController : Controller
                 }).ToList()
             };
 
-            return View(viewModel);
+            return View("Form", viewModel);
         }
         catch (Exception ex)
         {
@@ -178,32 +129,44 @@ public class ProductsController : Controller
         }
     }
 
-    // POST: Products/Edit/5
+    // POST: Products/Save (handles both create and edit)
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, UpdateProductViewModel viewModel)
+    public async Task<IActionResult> Save(ProductFormViewModel viewModel)
     {
         try
         {
-            if (id != viewModel.Id)
-            {
-                TempData["Error"] = "Product ID mismatch.";
-                return RedirectToAction(nameof(Index));
-            }
-
             if (ModelState.IsValid)
             {
-                var updateDto = new UpdateProductDto
+                if (viewModel.IsCreate)
                 {
-                    Name = viewModel.Name,
-                    Description = viewModel.Description,
-                    Price = viewModel.Price,
-                    CategoryId = viewModel.CategoryId
-                };
+                    // Create new product
+                    var createDto = new CreateProductDto
+                    {
+                        Name = viewModel.Name,
+                        Description = viewModel.Description,
+                        Price = viewModel.Price,
+                        CategoryId = viewModel.CategoryId
+                    };
 
-                await _apiClient.UpdateProductAsync(id, updateDto);
+                    await _apiClient.CreateProductAsync(createDto);
+                    TempData["Success"] = "Product created successfully!";
+                }
+                else
+                {
+                    // Update existing product
+                    var updateDto = new UpdateProductDto
+                    {
+                        Name = viewModel.Name,
+                        Description = viewModel.Description,
+                        Price = viewModel.Price,
+                        CategoryId = viewModel.CategoryId
+                    };
 
-                TempData["Success"] = "Product updated successfully!";
+                    await _apiClient.UpdateProductAsync(viewModel.Id, updateDto);
+                    TempData["Success"] = "Product updated successfully!";
+                }
+
                 return RedirectToAction(nameof(Index));
             }
 
@@ -215,12 +178,14 @@ public class ProductsController : Controller
                 Name = c.Name
             }).ToList();
 
-            return View(viewModel);
+            return View("Form", viewModel);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error updating product with ID: {ProductId}", id);
-            TempData["Error"] = "An error occurred while updating the product.";
+            _logger.LogError(ex, "Error saving product");
+            TempData["Error"] = viewModel.IsCreate
+                ? "An error occurred while creating the product."
+                : "An error occurred while updating the product.";
 
             // Reload categories
             var categories = await _apiClient.GetCategoriesAsync();
@@ -230,7 +195,7 @@ public class ProductsController : Controller
                 Name = c.Name
             }).ToList();
 
-            return View(viewModel);
+            return View("Form", viewModel);
         }
     }
 

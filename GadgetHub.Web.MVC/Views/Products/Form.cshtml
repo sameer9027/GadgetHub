@@ -1,18 +1,21 @@
-﻿@model GadgetHub.Web.MVC.ViewModels.Products.UpdateProductViewModel
+﻿@model GadgetHub.Web.MVC.ViewModels.Products.ProductFormViewModel
 
 @{
-    ViewData["Title"] = "Edit Product";
+    ViewData["Title"] = Model.IsCreate ? "Create Product" : "Edit Product";
 }
 
 <div class="row">
     <div class="col-md-8 mx-auto">
         <div class="card">
             <div class="card-header">
-                <h4 class="mb-0">Edit Product</h4>
+                <h4 class="mb-0">@(Model.IsCreate ? "Create New Product" : "Edit Product")</h4>
             </div>
             <div class="card-body">
-                <form asp-action="Edit" method="post">
-                    <input type="hidden" asp-for="Id" />
+                <form asp-action="Save" method="post">
+                    @if (!Model.IsCreate)
+                    {
+                        <input type="hidden" asp-for="Id" />
+                    }
 
                     <div class="mb-3">
                         <label asp-for="Name" class="form-label">Product Name</label>
@@ -42,7 +45,9 @@
 
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                         <a asp-action="Index" class="btn btn-secondary me-md-2">Back to List</a>
-                        <button type="submit" class="btn btn-primary">Update Product</button>
+                        <button type="submit" class="btn btn-primary">
+                            @(Model.IsCreate ? "Create Product" : "Update Product")
+                        </button>
                     </div>
                 </form>
             </div>
