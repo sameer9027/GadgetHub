@@ -19,6 +19,7 @@ public class ProductsController : Controller
     }
 
     // GET: Products
+
     public async Task<IActionResult> Index(ProductFilterViewModel filter, int page = 1, int pageSize = 10)
     {
         try

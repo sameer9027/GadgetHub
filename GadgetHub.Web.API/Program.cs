@@ -1,10 +1,17 @@
 using GadgetHub.Application;
 using GadgetHub.Application.Common.Mappings;
+using GadgetHub.Application.Services;
+using GadgetHub.Domain.Interfaces;
 using GadgetHub.Infrastructure;
 using GadgetHub.Infrastructure.Data;
+using GadgetHub.Infrastructure.Repositories;
+using GadgetHub.Infrastructure.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 
+using System.Text;
 
 namespace GadgetHub.Web.API
 {
@@ -16,8 +23,7 @@ namespace GadgetHub.Web.API
 
             // Add services to the container
             builder.Services.AddControllers();
-            
-           
+
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
             {
@@ -28,6 +34,23 @@ namespace GadgetHub.Web.API
                     Description = "API for GadgetHub Product Catalog Management"
                 });
             });
+
+            // JWT Authentication
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                        ValidAudience = builder.Configuration["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+                    };
+                });
 
             // AutoMapper setup
             builder.Services.AddAutoMapper(cfg =>
@@ -43,6 +66,11 @@ namespace GadgetHub.Web.API
             builder.Services.AddApplication(builder.Configuration);
             builder.Services.AddInfrastructure(builder.Configuration);
 
+            // Add authentication services
+            builder.Services.AddScoped<ITokenService, TokenService>();
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+           
             var app = builder.Build();
 
             // Configure the HTTP request pipeline
@@ -52,12 +80,16 @@ namespace GadgetHub.Web.API
                 app.UseSwaggerUI(c =>
                 {
                     c.SwaggerEndpoint("/swagger/v1/swagger.json", "GadgetHub API v1");
-                    c.RoutePrefix = "swagger"; // Accessible at /swagger
+                    c.RoutePrefix = "swagger";
                 });
             }
 
             app.UseHttpsRedirection();
+
+            // Add Authentication middleware
+            app.UseAuthentication();
             app.UseAuthorization();
+
             app.MapControllers();
 
             app.Run();
