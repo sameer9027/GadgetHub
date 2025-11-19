@@ -1,18 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using GadgetHub.Web.MVC.Services;
 using GadgetHub.Web.MVC.ViewModels.Products;
 using GadgetHub.Web.MVC.ViewModels.Categories;
 using GadgetHub.Application.DTOs.Products;
 using GadgetHub.Application.DTOs.Categories;
+using GadgetHub.Web.MVC.Interface;
 
 namespace GadgetHub.Web.MVC.Controllers;
 
 public class ProductsController : Controller
 {
-    private readonly IApiClient _apiClient;
+    private readonly IProductsApiClient _apiClient;
     private readonly ILogger<ProductsController> _logger;
 
-    public ProductsController(IApiClient apiClient, ILogger<ProductsController> logger)
+    public ProductsController(IProductsApiClient apiClient, ILogger<ProductsController> logger)
     {
         _apiClient = apiClient;
         _logger = logger;

@@ -2,16 +2,17 @@
 using System.Text.Json;
 using GadgetHub.Application.DTOs.Categories;
 using GadgetHub.Application.DTOs.Products;
+using GadgetHub.Web.MVC.Interface;
 
 namespace GadgetHub.Web.MVC.Services;
 
-public class ApiClient : IApiClient
+public class ProductsApiClient : IProductsApiClient
 {
     private readonly HttpClient _httpClient;
-    private readonly ILogger<ApiClient> _logger;
+    private readonly ILogger<ProductsApiClient> _logger;
     private readonly JsonSerializerOptions _jsonOptions;
 
-    public ApiClient(HttpClient httpClient, ILogger<ApiClient> logger)
+    public ProductsApiClient(HttpClient httpClient, ILogger<ProductsApiClient> logger)
     {
         _httpClient = httpClient;
         _logger = logger;
@@ -99,8 +100,6 @@ public class ApiClient : IApiClient
         var response = await _httpClient.DeleteAsync($"api/products/{id}");
         response.EnsureSuccessStatusCode();
     }
-
-    // Category methods
     public async Task<IEnumerable<CategoryDto>> GetCategoriesAsync()
     {
         try
@@ -120,47 +119,6 @@ public class ApiClient : IApiClient
         }
     }
 
-    public async Task<CategoryDto?> GetCategoryByIdAsync(int id)
-    {
-        try
-        {
-            var response = await _httpClient.GetAsync($"api/categories/{id}");
-            if (response.IsSuccessStatusCode)
-            {
-                var content = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<CategoryDto>(content, _jsonOptions);
-            }
-            return null;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting category by ID: {CategoryId}", id);
-            return null;
-        }
-    }
-
-    public async Task<CategoryDto> CreateCategoryAsync(CreateCategoryDto category)
-    {
-        var content = new StringContent(JsonSerializer.Serialize(category, _jsonOptions), Encoding.UTF8, "application/json");
-        var response = await _httpClient.PostAsync("api/categories", content);
-        response.EnsureSuccessStatusCode();
-
-        var responseContent = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<CategoryDto>(responseContent, _jsonOptions)!;
-    }
-
-    public async Task UpdateCategoryAsync(int id, UpdateCategoryDto category)
-    {
-        var content = new StringContent(JsonSerializer.Serialize(category, _jsonOptions), Encoding.UTF8, "application/json");
-        var response = await _httpClient.PutAsync($"api/categories/{id}", content);
-        response.EnsureSuccessStatusCode();
-    }
-
-    public async Task DeleteCategoryAsync(int id)
-    {
-        var response = await _httpClient.DeleteAsync($"api/categories/{id}");
-        response.EnsureSuccessStatusCode();
-    }
 
     // Helper class for deserializing paged response
     private class ProductsPagedResponse

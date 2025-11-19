@@ -1,9 +1,9 @@
 ﻿using GadgetHub.Application.DTOs.Categories;
 using GadgetHub.Application.DTOs.Products;
 
-namespace GadgetHub.Web.MVC.Services;
+namespace GadgetHub.Web.MVC.Interface;
 
-public interface IApiClient
+public interface IProductsApiClient
 {
    
     Task<(IEnumerable<ProductDto>, int)> GetProductsPagedAsync(int page, int pageSize, int? categoryId, string? sortBy, bool? sortAsc, string? searchTerm);
@@ -11,11 +11,7 @@ public interface IApiClient
     Task<ProductDto> CreateProductAsync(CreateProductDto product);
     Task UpdateProductAsync(int id, UpdateProductDto product);
     Task DeleteProductAsync(int id);
-
-   
     Task<IEnumerable<CategoryDto>> GetCategoriesAsync();
-    Task<CategoryDto?> GetCategoryByIdAsync(int id);
-    Task<CategoryDto> CreateCategoryAsync(CreateCategoryDto category);
-    Task UpdateCategoryAsync(int id, UpdateCategoryDto category);
-    Task DeleteCategoryAsync(int id);
+
+
 }

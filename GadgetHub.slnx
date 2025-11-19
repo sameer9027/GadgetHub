@@ -1,16 +1,16 @@
 <Solution>
   <Folder Name="/Backend/">
-    <Project Path="../../../../../../../../GadgetHubFile/GadgetHub/GadgetHub.Application/GadgetHub.Application.csproj" />
-    <Project Path="../../../../../../../../GadgetHubFile/GadgetHub/GadgetHub.Domain/GadgetHub.Domain.csproj" />
-    <Project Path="../../../../../../../../GadgetHubFile/GadgetHub/GadgetHub.Infrastructure/GadgetHub.Infrastructure.csproj" />
-    <Project Path="../../../../../../../../GadgetHubFile/GadgetHub/GadgetHub.Web.API/GadgetHub.Web.API.csproj" />
+    <Project Path="GadgetHub.Application/GadgetHub.Application.csproj" />
+    <Project Path="GadgetHub.Domain/GadgetHub.Domain.csproj" />
+    <Project Path="GadgetHub.Infrastructure/GadgetHub.Infrastructure.csproj" />
+    <Project Path="GadgetHub.Web.API/GadgetHub.Web.API.csproj" />
   </Folder>
   <Folder Name="/Frontend/">
-    <Project Path="../../../../../../../../GadgetHubFile/GadgetHub/GadgetHub.Web.MVC/GadgetHub.Web.MVC.csproj" />
+    <Project Path="GadgetHub.Web.MVC/GadgetHub.Web.MVC.csproj" />
   </Folder>
   <Folder Name="/Test/">
-    <Project Path="../../../../../../../../GadgetHubFile/GadgetHub/GadgetHub.Application.Tests/GadgetHub.Application.Tests.csproj" />
-    <Project Path="../../../../../../../../GadgetHubFile/GadgetHub/GadgetHub.Domain.Tests/GadgetHub.Domain.Tests.csproj" />
-    <Project Path="../../../../../../../../GadgetHubFile/GadgetHub/GadgetHub.Web.API.Tests/GadgetHub.Web.API.Tests.csproj" />
+    <Project Path="GadgetHub.Application.Tests/GadgetHub.Application.Tests.csproj" />
+    <Project Path="GadgetHub.Domain.Tests/GadgetHub.Domain.Tests.csproj" />
+    <Project Path="GadgetHub.Web.API.Tests/GadgetHub.Web.API.Tests.csproj" />
   </Folder>
 </Solution>

@@ -1,16 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using GadgetHub.Web.MVC.Services;
 using GadgetHub.Web.MVC.ViewModels.Categories;
 using GadgetHub.Application.DTOs.Categories;
+using GadgetHub.Web.MVC.Interface;
 
 namespace GadgetHub.Web.MVC.Controllers;
 
 public class CategoriesController : Controller
 {
-    private readonly IApiClient _apiClient;
+    private readonly ICategoriesApiClient _apiClient;
     private readonly ILogger<CategoriesController> _logger;
 
-    public CategoriesController(IApiClient apiClient, ILogger<CategoriesController> logger)
+    public CategoriesController(ICategoriesApiClient apiClient, ILogger<CategoriesController> logger)
     {
         _apiClient = apiClient;
         _logger = logger;
