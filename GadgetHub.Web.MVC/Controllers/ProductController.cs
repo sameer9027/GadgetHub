@@ -7,21 +7,37 @@ using GadgetHub.Web.MVC.Interface;
 
 namespace GadgetHub.Web.MVC.Controllers;
 
-public class ProductsController : Controller
+public class ProductController : Controller
 {
-    private readonly IProductsApiClient _apiClient;
-    private readonly ILogger<ProductsController> _logger;
+    private readonly IProductApiClient _apiClient;
+    private readonly ILogger<ProductController> _logger;
 
-    public ProductsController(IProductsApiClient apiClient, ILogger<ProductsController> logger)
+    public ProductController(IProductApiClient apiClient, ILogger<ProductController> logger)
     {
         _apiClient = apiClient;
         _logger = logger;
     }
 
-    // GET: Products
+    private bool IsUserLoggedIn() // Login check function 
+    {
+        return !string.IsNullOrEmpty(HttpContext.Session.GetString("JWTToken"));
+    }
 
+    private IActionResult RedirectToLogin()
+    {
+        TempData["Error"] = "Please login to access products.";
+        return RedirectToAction("Login", "Login");
+    }
+
+    // GET: Products
     public async Task<IActionResult> Index(ProductFilterViewModel filter, int page = 1, int pageSize = 10)
     {
+        // Check login
+        if (!IsUserLoggedIn())
+        {
+            return RedirectToLogin();
+        }
+
         try
         {
             var (products, totalCount) = await _apiClient.GetProductsPagedAsync(
@@ -70,6 +86,12 @@ public class ProductsController : Controller
     // GET: Products/Create
     public async Task<IActionResult> Create()
     {
+        // Check login
+        if (!IsUserLoggedIn())
+        {
+            return RedirectToLogin();
+        }
+
         try
         {
             var categories = await _apiClient.GetCategoriesAsync();
@@ -96,6 +118,12 @@ public class ProductsController : Controller
     // GET: Products/Edit/5
     public async Task<IActionResult> Edit(int id)
     {
+        // Check login
+        if (!IsUserLoggedIn())
+        {
+            return RedirectToLogin();
+        }
+
         try
         {
             var product = await _apiClient.GetProductByIdAsync(id);
@@ -135,6 +163,12 @@ public class ProductsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Save(ProductFormViewModel viewModel)
     {
+        // Check login
+        if (!IsUserLoggedIn())
+        {
+            return RedirectToLogin();
+        }
+
         try
         {
             if (ModelState.IsValid)
@@ -205,6 +239,12 @@ public class ProductsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id)
     {
+        // Check login
+        if (!IsUserLoggedIn())
+        {
+            return RedirectToLogin();
+        }
+
         try
         {
             await _apiClient.DeleteProductAsync(id);

@@ -1,10 +1,14 @@
-﻿@model GadgetHub.Web.MVC.ViewModels.Authorize.RegisterViewModel
+﻿@model GadgetHub.Web.MVC.ViewModels.Authorize.LoginViewModel
+
+@{
+    ViewData["Title"] = "Login";
+}
 
 <div class="row justify-content-center">
     <div class="col-md-4">
         <div class="card">
             <div class="card-header">
-                <h2 class="text-center">Register</h2>
+                <h2 class="text-center">Login</h2>
             </div>
             <div class="card-body">
                 @if (TempData["Success"] != null)
@@ -17,7 +21,7 @@
                     <div class="alert alert-danger">@ViewBag.Error</div>
                 }
 
-                <form method="post" asp-action="Register" asp-controller="Register">
+                <form method="post" asp-action="Index" asp-controller="Product">
                     <div class="form-group mb-3">
                         <label asp-for="Username" class="form-label"></label>
                         <input asp-for="Username" class="form-control" />
@@ -30,19 +34,19 @@
                         <span asp-validation-for="Password" class="text-danger"></span>
                     </div>
 
-                    <div class="form-group mb-3">
-                        <label asp-for="ConfirmPassword" class="form-label"></label>
-                        <input asp-for="ConfirmPassword" type="password" class="form-control" />
-                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary w-100">Register</button>
+                    <button type="submit" class="btn btn-primary w-100">Login</button>
                 </form>
 
                 <div class="text-center mt-3">
-                    <p>Already have an account? <a href="/Login/Login">Login here</a></p>
+                    <p>Don't have an account? <a href="/Register/Register">Register here</a></p>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -19,7 +19,7 @@ namespace GadgetHub.Application.Common.Mappings
             config.NewConfig<CreateProductDto, Product>();
             config.NewConfig<UpdateProductDto, Product>();
             config.NewConfig<RegisterRequestDto, User>();
-            
+          
             // Category mappings
             config.NewConfig<Category, CategoryDto>();
             config.NewConfig<CreateCategoryDto, Category>();

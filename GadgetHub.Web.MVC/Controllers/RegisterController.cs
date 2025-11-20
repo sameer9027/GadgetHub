@@ -40,7 +40,7 @@ namespace GadgetHub.Web.MVC.Controllers
             if (success)
             {
                 TempData["Success"] = "Registration successful! Please login.";
-                return RedirectToAction("Login", "Auth");
+                return RedirectToAction("Login", "Login");
             }
             else
             {

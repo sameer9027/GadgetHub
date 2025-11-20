@@ -7,7 +7,7 @@ using System.Text.Json;
 
 namespace GadgetHub.Web.MVC.HttpClients
 {
-    public class CategoriesApiClient : ICategoriesApiClient
+    public class CategoriesApiClient : ICategoryApiClient
     {
         private readonly HttpClient _httpClient;
         private readonly ILogger<ProductsApiClient> _logger;

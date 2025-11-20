@@ -6,12 +6,12 @@ namespace GadgetHub.Web.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class CategoriesController : ControllerBase
+public class CategoryController : ControllerBase
 {
     private readonly ICategoryService _categoryService;
-    private readonly ILogger<CategoriesController> _logger;
+    private readonly ILogger<CategoryController> _logger;
 
-    public CategoriesController(ICategoryService categoryService, ILogger<CategoriesController> logger)
+    public CategoryController(ICategoryService categoryService, ILogger<CategoryController> logger)
     {
         _categoryService = categoryService;
         _logger = logger;

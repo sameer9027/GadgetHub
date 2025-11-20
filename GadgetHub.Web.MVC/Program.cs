@@ -8,12 +8,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 // Configure HttpClient for API calls
-builder.Services.AddHttpClient<IProductsApiClient, ProductsApiClient>(client =>
+builder.Services.AddHttpClient<IProductApiClient, ProductsApiClient>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"] ?? "https://localhost:44379/");
     client.DefaultRequestHeaders.Add("Accept", "application/json");
 });
-builder.Services.AddHttpClient<ICategoriesApiClient, CategoriesApiClient>(client =>
+builder.Services.AddHttpClient<ICategoryApiClient, CategoriesApiClient>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"] ?? "https://localhost:44379/");
     client.DefaultRequestHeaders.Add("Accept", "application/json");
@@ -23,7 +23,14 @@ builder.Services.AddHttpClient<IRegisterApiClient, RegisterApiClient>(client =>
     client.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"] ?? "https://localhost:44379/");
     client.DefaultRequestHeaders.Add("Accept", "application/json");
 });
+builder.Services.AddHttpClient<ILoginApiClient, LoginApiClient>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"] ?? "https://localhost:44379/");
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+});
+builder.Services.AddSession();
 var app = builder.Build();
+app.UseSession();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -39,6 +46,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Products}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

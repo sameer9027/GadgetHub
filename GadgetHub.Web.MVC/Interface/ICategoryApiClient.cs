@@ -2,7 +2,7 @@
 
 namespace GadgetHub.Web.MVC.Interface
 {
-    public interface ICategoriesApiClient
+    public interface ICategoryApiClient
     {
         Task<IEnumerable<CategoryDto>> GetCategoriesAsync();
         Task<CategoryDto?> GetCategoryByIdAsync(int id);

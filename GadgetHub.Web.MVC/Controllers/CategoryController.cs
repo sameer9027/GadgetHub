@@ -5,12 +5,12 @@ using GadgetHub.Web.MVC.Interface;
 
 namespace GadgetHub.Web.MVC.Controllers;
 
-public class CategoriesController : Controller
+public class CategoryController : Controller
 {
-    private readonly ICategoriesApiClient _apiClient;
-    private readonly ILogger<CategoriesController> _logger;
+    private readonly ICategoryApiClient _apiClient;
+    private readonly ILogger<CategoryController> _logger;
 
-    public CategoriesController(ICategoriesApiClient apiClient, ILogger<CategoriesController> logger)
+    public CategoryController(ICategoryApiClient apiClient, ILogger<CategoryController> logger)
     {
         _apiClient = apiClient;
         _logger = logger;

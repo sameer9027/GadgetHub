@@ -3,7 +3,7 @@ using GadgetHub.Application.DTOs.Products;
 
 namespace GadgetHub.Web.MVC.Interface;
 
-public interface IProductsApiClient
+public interface IProductApiClient
 {
    
     Task<(IEnumerable<ProductDto>, int)> GetProductsPagedAsync(int page, int pageSize, int? categoryId, string? sortBy, bool? sortAsc, string? searchTerm);

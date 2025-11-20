@@ -6,7 +6,7 @@ using GadgetHub.Web.MVC.Interface;
 
 namespace GadgetHub.Web.MVC.Services;
 
-public class ProductsApiClient : IProductsApiClient
+public class ProductsApiClient : IProductApiClient
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger<ProductsApiClient> _logger;
