@@ -1,5 +1,6 @@
 ﻿using GadgetHub.Application.DTOs.Products;
 using GadgetHub.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GadgetHub.Web.API.Controllers;
@@ -18,21 +19,22 @@ public class ProductController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult> GetProducts( [FromQuery] int page = 1,[FromQuery] int pageSize = 10,
+    [AllowAnonymous]
+    public async Task<ActionResult> GetProducts(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
         [FromQuery] int? categoryId = null,
         [FromQuery] string? sortBy = null,
         [FromQuery] bool? sortAsc = null,
         [FromQuery] string? search = null)
     {
-
-
         if (page <= 0) page = 1;
         if (pageSize <= 0) pageSize = 10;
 
         try
         {
             var (products, totalCount) = await _productService.GetPagedAsync(
-                page, pageSize, categoryId, sortBy, sortAsc, search);  // -  Delegates the work to the Service Layer.
+                page, pageSize, categoryId, sortBy, sortAsc, search);
 
             var response = new
             {
@@ -48,13 +50,12 @@ public class ProductController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error getting products");
-
-
             return Problem(detail: ex.ToString(), statusCode: 500, title: "An error occurred while retrieving products");
         }
     }
 
     [HttpGet("{id}")]
+    [AllowAnonymous]
     public async Task<ActionResult<ProductDto>> GetProduct(int id)
     {
         try
@@ -74,6 +75,7 @@ public class ProductController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<ProductDto>> CreateProduct(CreateProductDto createProductDto)
     {
         try
@@ -96,6 +98,7 @@ public class ProductController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = "Admin ")]
     public async Task<IActionResult> UpdateProduct(int id, UpdateProductDto updateProductDto)
     {
         try
@@ -118,6 +121,7 @@ public class ProductController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteProduct(int id)
     {
         try

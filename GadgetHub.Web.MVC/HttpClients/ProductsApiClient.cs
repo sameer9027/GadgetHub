@@ -1,55 +1,67 @@
-﻿using System.Text;
-using System.Text.Json;
+﻿using GadgetHub.Application.DTOs.Products;
 using GadgetHub.Application.DTOs.Categories;
-using GadgetHub.Application.DTOs.Products;
 using GadgetHub.Web.MVC.Interface;
+using System.Text;
+using System.Text.Json;
 
 namespace GadgetHub.Web.MVC.Services;
 
 public class ProductsApiClient : IProductApiClient
 {
     private readonly HttpClient _httpClient;
+    private readonly ITokenService _tokenService;
     private readonly ILogger<ProductsApiClient> _logger;
-    private readonly JsonSerializerOptions _jsonOptions;
 
-    public ProductsApiClient(HttpClient httpClient, ILogger<ProductsApiClient> logger)
+    public ProductsApiClient(HttpClient httpClient, ITokenService tokenService, ILogger<ProductsApiClient> logger)
     {
         _httpClient = httpClient;
+        _tokenService = tokenService;
         _logger = logger;
-        _jsonOptions = new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        };
     }
 
-    // Product methods
+    private void AddTokenToHeader()
+    {
+        var token = _tokenService.GetToken();
+
+        // Clear any existing authorization header
+        _httpClient.DefaultRequestHeaders.Remove("Authorization");
+
+        if (!string.IsNullOrEmpty(token))
+        {
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+        }
+    }
+
     public async Task<(IEnumerable<ProductDto>, int)> GetProductsPagedAsync(int page, int pageSize, int? categoryId, string? sortBy, bool? sortAsc, string? searchTerm)
     {
         try
         {
-            var queryParams = new List<string>
-            {
-                $"page={page}",
-                $"pageSize={pageSize}"
-            };
+            AddTokenToHeader();
 
-            if (categoryId.HasValue) queryParams.Add($"categoryId={categoryId}");
-            if (!string.IsNullOrEmpty(sortBy)) queryParams.Add($"sortBy={sortBy}"); 
-            if (sortAsc.HasValue) queryParams.Add($"sortAsc={sortAsc}");
-            if (!string.IsNullOrEmpty(searchTerm)) queryParams.Add($"search={searchTerm}");
+            var query = $"api/product?page={page}&pageSize={pageSize}";
+            if (categoryId.HasValue) query += $"&categoryId={categoryId}";
+            if (!string.IsNullOrEmpty(sortBy)) query += $"&sortBy={sortBy}";
+            if (sortAsc.HasValue) query += $"&sortAsc={sortAsc}";
+            if (!string.IsNullOrEmpty(searchTerm)) query += $"&search={searchTerm}";
 
-            var queryString = string.Join("&", queryParams);
-            var response = await _httpClient.GetAsync($"api/products?{queryString}");
+            var response = await _httpClient.GetAsync(query);
 
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                var result = JsonSerializer.Deserialize<ProductsPagedResponse>(content, _jsonOptions);
+                var result = JsonSerializer.Deserialize<ProductsPagedResponse>(content, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
                 return (result?.Items ?? new List<ProductDto>(), result?.TotalCount ?? 0);
             }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                _logger.LogWarning("Unauthorized access to products API");
+                return (new List<ProductDto>(), 0);
+            }
 
-            _logger.LogWarning("Failed to get products. Status: {StatusCode}", response.StatusCode);
             return (new List<ProductDto>(), 0);
         }
         catch (Exception ex)
@@ -63,12 +75,18 @@ public class ProductsApiClient : IProductApiClient
     {
         try
         {
-            var response = await _httpClient.GetAsync($"api/products/{id}");
+            AddTokenToHeader();
+            var response = await _httpClient.GetAsync($"api/product/{id}");
+
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<ProductDto>(content, _jsonOptions);
+                return JsonSerializer.Deserialize<ProductDto>(content, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
             }
+
             return null;
         }
         catch (Exception ex)
@@ -80,36 +98,49 @@ public class ProductsApiClient : IProductApiClient
 
     public async Task<ProductDto> CreateProductAsync(CreateProductDto product)
     {
-        var content = new StringContent(JsonSerializer.Serialize(product, _jsonOptions), Encoding.UTF8, "application/json");
-        var response = await _httpClient.PostAsync("api/products", content);
+        AddTokenToHeader();
+        var content = new StringContent(JsonSerializer.Serialize(product), Encoding.UTF8, "application/json");
+        var response = await _httpClient.PostAsync("api/product", content);
         response.EnsureSuccessStatusCode();
 
         var responseContent = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<ProductDto>(responseContent, _jsonOptions)!;
+        return JsonSerializer.Deserialize<ProductDto>(responseContent, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        })!;
     }
 
     public async Task UpdateProductAsync(int id, UpdateProductDto product)
     {
-        var content = new StringContent(JsonSerializer.Serialize(product, _jsonOptions), Encoding.UTF8, "application/json");
-        var response = await _httpClient.PutAsync($"api/products/{id}", content);
+        AddTokenToHeader();
+        var content = new StringContent(JsonSerializer.Serialize(product), Encoding.UTF8, "application/json");
+        var response = await _httpClient.PutAsync($"api/product/{id}", content);
         response.EnsureSuccessStatusCode();
     }
 
     public async Task DeleteProductAsync(int id)
     {
-        var response = await _httpClient.DeleteAsync($"api/products/{id}");
+        AddTokenToHeader();
+        var response = await _httpClient.DeleteAsync($"api/product/{id}");
         response.EnsureSuccessStatusCode();
     }
+
     public async Task<IEnumerable<CategoryDto>> GetCategoriesAsync()
     {
         try
         {
-            var response = await _httpClient.GetAsync("api/categories");
+            AddTokenToHeader();
+            var response = await _httpClient.GetAsync("api/category");
+
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<IEnumerable<CategoryDto>>(content, _jsonOptions) ?? new List<CategoryDto>();
+                return JsonSerializer.Deserialize<IEnumerable<CategoryDto>>(content, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                }) ?? new List<CategoryDto>();
             }
+
             return new List<CategoryDto>();
         }
         catch (Exception ex)
@@ -119,8 +150,6 @@ public class ProductsApiClient : IProductApiClient
         }
     }
 
-
-    // Helper class for deserializing paged response
     private class ProductsPagedResponse
     {
         public IEnumerable<ProductDto> Items { get; set; } = new List<ProductDto>();

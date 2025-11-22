@@ -11,16 +11,19 @@ public class ProductController : Controller
 {
     private readonly IProductApiClient _apiClient;
     private readonly ILogger<ProductController> _logger;
+    private readonly ITokenService _tokenService;
 
-    public ProductController(IProductApiClient apiClient, ILogger<ProductController> logger)
+    public ProductController(IProductApiClient apiClient, ILogger<ProductController> logger, ITokenService tokenService)
     {
         _apiClient = apiClient;
         _logger = logger;
+        _tokenService = tokenService;
     }
 
-    private bool IsUserLoggedIn() // Login check function 
+    private bool IsUserLoggedIn()
     {
-        return !string.IsNullOrEmpty(HttpContext.Session.GetString("JWTToken"));
+        var token = _tokenService.GetToken();
+        return !string.IsNullOrEmpty(token);
     }
 
     private IActionResult RedirectToLogin()
@@ -32,7 +35,7 @@ public class ProductController : Controller
     // GET: Products
     public async Task<IActionResult> Index(ProductFilterViewModel filter, int page = 1, int pageSize = 10)
     {
-        // Check login
+       
         if (!IsUserLoggedIn())
         {
             return RedirectToLogin();
@@ -118,7 +121,7 @@ public class ProductController : Controller
     // GET: Products/Edit/5
     public async Task<IActionResult> Edit(int id)
     {
-        // Check login
+    
         if (!IsUserLoggedIn())
         {
             return RedirectToLogin();
@@ -163,7 +166,7 @@ public class ProductController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Save(ProductFormViewModel viewModel)
     {
-        // Check login
+     
         if (!IsUserLoggedIn())
         {
             return RedirectToLogin();
@@ -258,4 +261,46 @@ public class ProductController : Controller
 
         return RedirectToAction(nameof(Index));
     }
+
+    // GET: Products/Details/5
+    public async Task<IActionResult> Details(int id)
+    {
+        // Check login
+        if (!IsUserLoggedIn())
+        {
+            return RedirectToLogin();
+        }
+
+        try
+        {
+            var product = await _apiClient.GetProductByIdAsync(id);
+            if (product == null)
+            {
+                TempData["Error"] = "Product not found.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var viewModel = new ProductViewModel
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                Price = product.Price,
+                CreatedDate = product.CreatedDate,
+                CategoryId = product.CategoryId,
+                CategoryName = product.CategoryName
+            };
+
+            return View(viewModel);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error loading product details for ID: {ProductId}", id);
+            TempData["Error"] = "An error occurred while loading product details.";
+            return RedirectToAction(nameof(Index));
+        }
+    }
+
+  
+    
 }

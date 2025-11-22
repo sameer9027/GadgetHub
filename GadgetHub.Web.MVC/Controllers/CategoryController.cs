@@ -9,16 +9,31 @@ public class CategoryController : Controller
 {
     private readonly ICategoryApiClient _apiClient;
     private readonly ILogger<CategoryController> _logger;
+    private readonly ITokenService _tokenService;
 
-    public CategoryController(ICategoryApiClient apiClient, ILogger<CategoryController> logger)
+    public CategoryController(ICategoryApiClient apiClient, ILogger<CategoryController> logger, ITokenService tokenService)
     {
+        _tokenService = tokenService;
         _apiClient = apiClient;
         _logger = logger;
     }
-
+    private bool IsUserLoggedIn()
+    {
+        var token = _tokenService.GetToken();
+        return !string.IsNullOrEmpty(token);
+    }
+    private IActionResult RedirectToLogin()
+    {
+        TempData["Error"] = "Please login to access products.";
+        return RedirectToAction("Login", "Login");
+    }
     // GET: Categories
     public async Task<IActionResult> Index()
     {
+        if (!IsUserLoggedIn())
+        {
+            return RedirectToLogin();
+        }
         try
         {
             var categories = await _apiClient.GetCategoriesAsync();
@@ -43,6 +58,10 @@ public class CategoryController : Controller
     // GET: Categories/Create
     public IActionResult Create()
     {
+        if (!IsUserLoggedIn())
+        {
+            return RedirectToLogin();
+        }
         return View(new CreateCategoryViewModel());
     }
 
@@ -51,6 +70,11 @@ public class CategoryController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateCategoryViewModel viewModel)
     {
+
+        if (!IsUserLoggedIn())
+        {
+            return RedirectToLogin();
+        }
         try
         {
             if (ModelState.IsValid)
@@ -80,6 +104,10 @@ public class CategoryController : Controller
     // GET: Categories/Edit/5
     public async Task<IActionResult> Edit(int id)
     {
+        if (!IsUserLoggedIn())
+        {
+            return RedirectToLogin();
+        }
         try
         {
             var category = await _apiClient.GetCategoryByIdAsync(id);
@@ -111,6 +139,10 @@ public class CategoryController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, UpdateCategoryViewModel viewModel)
     {
+        if (!IsUserLoggedIn())
+        {
+            return RedirectToLogin();
+        }
         try
         {
             if (id != viewModel.Id)
@@ -148,6 +180,10 @@ public class CategoryController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id)
     {
+        if (!IsUserLoggedIn())
+        {
+            return RedirectToLogin();
+        }
         try
         {
             await _apiClient.DeleteCategoryAsync(id);

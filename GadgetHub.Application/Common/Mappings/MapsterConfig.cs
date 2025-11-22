@@ -16,14 +16,11 @@ namespace GadgetHub.Application.Common.Mappings
             config.NewConfig<Product, ProductDto>()
                   .Map(dest => dest.CategoryName, src => src.Category.Name);
 
-            config.NewConfig<CreateProductDto, Product>();
-            config.NewConfig<UpdateProductDto, Product>();
-            config.NewConfig<RegisterRequestDto, User>();
+ 
           
             // Category mappings
             config.NewConfig<Category, CategoryDto>();
-            config.NewConfig<CreateCategoryDto, Category>();
-            config.NewConfig<UpdateCategoryDto, Category>();
+         
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using GadgetHub.Application.DTOs.Categories;
 using GadgetHub.Web.MVC.Interface;
-using GadgetHub.Web.MVC.Services;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -10,12 +9,14 @@ namespace GadgetHub.Web.MVC.HttpClients
     public class CategoriesApiClient : ICategoryApiClient
     {
         private readonly HttpClient _httpClient;
-        private readonly ILogger<ProductsApiClient> _logger;
+        private readonly ITokenService _tokenService;
+        private readonly ILogger<CategoriesApiClient> _logger;
         private readonly JsonSerializerOptions _jsonOptions;
 
-        public CategoriesApiClient(HttpClient httpClient, ILogger<ProductsApiClient> logger)
+        public CategoriesApiClient(HttpClient httpClient, ITokenService tokenService, ILogger<CategoriesApiClient> logger)
         {
             _httpClient = httpClient;
+            _tokenService = tokenService;
             _logger = logger;
             _jsonOptions = new JsonSerializerOptions
             {
@@ -23,11 +24,26 @@ namespace GadgetHub.Web.MVC.HttpClients
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
         }
+
+        private void AddTokenToHeader()
+        {
+            var token = _tokenService.GetToken();
+
+            _httpClient.DefaultRequestHeaders.Remove("Authorization");
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            }
+        }
+
         public async Task<IEnumerable<CategoryDto>> GetCategoriesAsync()
         {
             try
             {
-                var response = await _httpClient.GetAsync("api/categories");
+                AddTokenToHeader();
+                var response = await _httpClient.GetAsync("api/category");
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
@@ -46,7 +62,8 @@ namespace GadgetHub.Web.MVC.HttpClients
         {
             try
             {
-                var response = await _httpClient.GetAsync($"api/categories/{id}");
+                AddTokenToHeader();
+                var response = await _httpClient.GetAsync($"api/category/{id}");
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
@@ -63,8 +80,9 @@ namespace GadgetHub.Web.MVC.HttpClients
 
         public async Task<CategoryDto> CreateCategoryAsync(CreateCategoryDto category)
         {
+            AddTokenToHeader();
             var content = new StringContent(JsonSerializer.Serialize(category, _jsonOptions), Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync("api/categories", content);
+            var response = await _httpClient.PostAsync("api/category", content);
             response.EnsureSuccessStatusCode();
 
             var responseContent = await response.Content.ReadAsStringAsync();
@@ -73,16 +91,17 @@ namespace GadgetHub.Web.MVC.HttpClients
 
         public async Task UpdateCategoryAsync(int id, UpdateCategoryDto category)
         {
+            AddTokenToHeader();
             var content = new StringContent(JsonSerializer.Serialize(category, _jsonOptions), Encoding.UTF8, "application/json");
-            var response = await _httpClient.PutAsync($"api/categories/{id}", content);
+            var response = await _httpClient.PutAsync($"api/category/{id}", content);
             response.EnsureSuccessStatusCode();
         }
 
         public async Task DeleteCategoryAsync(int id)
         {
-            var response = await _httpClient.DeleteAsync($"api/categories/{id}");
+            AddTokenToHeader();
+            var response = await _httpClient.DeleteAsync($"api/category/{id}");
             response.EnsureSuccessStatusCode();
         }
-
     }
 }

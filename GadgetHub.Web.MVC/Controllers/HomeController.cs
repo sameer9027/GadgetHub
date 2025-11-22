@@ -12,7 +12,6 @@ namespace GadgetHub.Web.MVC.Controllers
                 return RedirectToAction("Index", "Product");
             }
 
-            // If not logged in, show home page
             return View();
         }
     }

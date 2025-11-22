@@ -26,7 +26,7 @@ namespace GadgetHub.Controllers
         {
             try
             {
-                _logger.LogInformation("Login attempt for user: {Username}", request.Username);
+
 
                 // Validate model
                 if (!ModelState.IsValid)
@@ -65,7 +65,6 @@ namespace GadgetHub.Controllers
         {
             try
             {
-                _logger.LogInformation("Registration attempt for user: {Username}", request.Username);
 
                 // Validate model
                 if (!ModelState.IsValid)

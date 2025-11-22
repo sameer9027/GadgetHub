@@ -70,6 +70,7 @@ namespace GadgetHub.Web.API
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+
            
             var app = builder.Build();
 

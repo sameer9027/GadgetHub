@@ -2,6 +2,7 @@
 using GadgetHub.Web.MVC.Interface;
 using GadgetHub.Application.DTOs.Auth;
 using Microsoft.AspNetCore.Mvc;
+using Mapster;
 
 namespace GadgetHub.Web.MVC.Controllers
 {
@@ -28,11 +29,7 @@ namespace GadgetHub.Web.MVC.Controllers
                 return View(request);
             }
 
-            var loginDto = new LoginRequestDto
-            {
-                Username = request.Username,
-                Password = request.Password
-            };
+            var loginDto = request.Adapt<LoginRequestDto>();
 
             var token = await _loginApiClient.LoginUserAsync(loginDto);
 

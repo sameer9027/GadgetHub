@@ -1,5 +1,6 @@
 ﻿using GadgetHub.Application.DTOs.Categories;
 using GadgetHub.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GadgetHub.Web.API.Controllers;
@@ -51,6 +52,7 @@ public class CategoryController : ControllerBase
     }
 
     [HttpPost]
+   [AllowAnonymous]
     public async Task<ActionResult<CategoryDto>> CreateCategory(CreateCategoryDto createCategoryDto)
     {
         try
@@ -73,6 +75,7 @@ public class CategoryController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> UpdateCategory(int id, UpdateCategoryDto updateCategoryDto)
     {
         try
@@ -95,6 +98,7 @@ public class CategoryController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteCategory(int id)
     {
         try

@@ -1,43 +1,43 @@
-﻿using GadgetHub.Application.DTOs.Auth;
-using GadgetHub.Web.MVC.Interface;
-using System.Text;
-using System.Text.Json;
+﻿    using GadgetHub.Application.DTOs.Auth;
+    using GadgetHub.Web.MVC.Interface;
+    using System.Text;
+    using System.Text.Json;
 
-namespace GadgetHub.Web.MVC.HttpClients
-{
-    public class LoginApiClient : ILoginApiClient
+    namespace GadgetHub.Web.MVC.HttpClients
     {
-        private readonly HttpClient _httpClient;
-
-        public LoginApiClient(HttpClient httpClient)
+        public class LoginApiClient : ILoginApiClient
         {
-            _httpClient = httpClient;
-        }
+            private readonly HttpClient _httpClient;
 
-        public async Task<string> LoginUserAsync(LoginRequestDto request)
-        {
-            try
+            public LoginApiClient(HttpClient httpClient)
             {
-                var json = JsonSerializer.Serialize(request);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                var response = await _httpClient.PostAsync("api/Auth/login", content);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseData = await response.Content.ReadAsStringAsync();
-                    var authResponse = JsonSerializer.Deserialize<AuthResponse>(responseData,
-                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-                    return authResponse?.Token;
-                }
-
-                return null;
+                _httpClient = httpClient;
             }
-            catch (Exception)
+
+            public async Task<string> LoginUserAsync(LoginRequestDto request)
             {
-                return null;
+                try
+                {
+                    var json = JsonSerializer.Serialize(request);
+                    var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                    var response = await _httpClient.PostAsync("api/Auth/login", content);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var responseData = await response.Content.ReadAsStringAsync();
+                        var authResponse = JsonSerializer.Deserialize<AuthResponse>(responseData,
+                            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                        return authResponse?.Token;
+                    }
+
+                    return null;
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
             }
         }
     }
-}

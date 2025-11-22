@@ -2,6 +2,7 @@
 using GadgetHub.Web.MVC.Interface;
 using GadgetHub.Application.DTOs.Auth;
 using Microsoft.AspNetCore.Mvc;
+using Mapster;
 
 namespace GadgetHub.Web.MVC.Controllers
 {
@@ -27,13 +28,9 @@ namespace GadgetHub.Web.MVC.Controllers
             {
                 return View(request);
             }
-
-            var registerDto = new RegisterRequestDto
-            {
-                Username = request.Username,
-                Password = request.Password,
-                ConfirmPassword = request.ConfirmPassword
-            };
+            
+          
+            var registerDto = request.Adapt<RegisterRequestDto>();
 
             var success = await _registerApiClient.RegisterUserAsync(registerDto);
 
