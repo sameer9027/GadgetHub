@@ -41,5 +41,5 @@ Flow example:
 - Database connection string key: "constr" in appsettings.json for GadgetHub.Web.API.
 - JWT values expected in configuration:
 - Jwt:Issuer, Jwt:Audience, Jwt:Key
-- API base URL in GadgetHub.Web.MVC Program.cs config: e.g. https://localhost:44379/ (adjust for your environment).
+- API base URL in GadgetHub.Web.MVC Program.cs config: e.g. https://localhost:44379/
 
