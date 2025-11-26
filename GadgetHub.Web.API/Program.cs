@@ -1,5 +1,6 @@
 using GadgetHub.Application;
 using GadgetHub.Application.Common.Mappings;
+using GadgetHub.Application.Interfaces;
 using GadgetHub.Application.Services;
 using GadgetHub.Domain.Interfaces;
 using GadgetHub.Infrastructure;
@@ -21,7 +22,9 @@ namespace GadgetHub.Web.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container
+            builder.Services.AddMemoryCache();
+            builder.Services.AddScoped<ICacheService, InMemoryCacheService>();
+
             builder.Services.AddControllers();
 
             builder.Services.AddEndpointsApiExplorer();
@@ -52,7 +55,7 @@ namespace GadgetHub.Web.API
                     };
                 });
 
-            // AutoMapper setup
+     
             builder.Services.AddAutoMapper(cfg =>
             {
                 cfg.AddProfile(typeof(MappingProfile));
@@ -62,11 +65,10 @@ namespace GadgetHub.Web.API
             builder.Services.AddDbContext<MyDBcontext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("constr")));
 
-            // Register Application and Infrastructure layers
+           
             builder.Services.AddApplication(builder.Configuration);
             builder.Services.AddInfrastructure(builder.Configuration);
 
-            // Add authentication services
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
@@ -77,6 +79,7 @@ namespace GadgetHub.Web.API
             // Configure the HTTP request pipeline
             if (app.Environment.IsDevelopment())
             {
+                app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>
                 {

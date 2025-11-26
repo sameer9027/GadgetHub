@@ -4,8 +4,18 @@ using GadgetHub.Web.MVC.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
+
+
+// BUNDLING 
 builder.Services.AddControllersWithViews();
+builder.Services.AddWebOptimizer(pipeline => {
+    pipeline.AddCssBundle("/css/bundle.css", "lib/bootstrap/dist/css/bootstrap.css", "css/site.css");
+    pipeline.AddJavaScriptBundle("/js/bundle.js", "lib/jquery/dist/jquery.js", "js/site.js");
+    pipeline.AddJavaScriptBundle("/js/validation.js",
+    "lib/jquery-validation/dist/jquery.validate.js",
+    "lib/jquery-validation-unobtrusive/js/jquery.validate.unobtrusive.js");
+
+} );
 builder.Services.AddSession();
 
 // Common HttpClient configuration
@@ -31,9 +41,11 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
+    app.UseWebOptimizer();
 }
 
 app.UseHttpsRedirection();
+app.UseWebOptimizer();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
