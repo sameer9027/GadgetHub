@@ -34,7 +34,7 @@ public class CategoryService : ICategoryService
         {
             const string cacheKey = "categories_all";
 
-            // Trying to get from cache first
+            
             var cachedCategories = await _cacheService.GetAsync<IEnumerable<CategoryDto>>(cacheKey);
             if (cachedCategories != null && cachedCategories.Any())
             {
@@ -76,14 +76,14 @@ public class CategoryService : ICategoryService
         {
             string cacheKey = $"category_{id}";
 
-            // Try to get from cache first
+          
             var cachedCategory = await _cacheService.GetAsync<CategoryDto>(cacheKey);
             if (cachedCategory != null)
             {
                 return cachedCategory;
             }
 
-            // If cache fails, gets from database
+         
             _logger.LogDebug("Cache miss for {CacheKey}, fetching from database", cacheKey);
 
             var category = await _categoryRepository.GetByIdAsync(id);
@@ -180,7 +180,7 @@ public class CategoryService : ICategoryService
 
             await _categoryRepository.DeleteAsync(category);
 
-            // Clearing relevant caches
+         
             await _cacheService.RemoveAsync("categories_all");
             await _cacheService.RemoveAsync($"category_{id}");
         }
